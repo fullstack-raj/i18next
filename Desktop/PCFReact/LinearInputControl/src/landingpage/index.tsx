@@ -1,39 +1,34 @@
 import * as React from 'react'
-import { IntlProvider, FormattedMessage, FormattedNumber } from 'react-intl'
+import { FormattedMessage, IntlProvider, useIntl } from 'react-intl';
+import Test from '../components/Test';
 
 const LandingPage = () => {
 
-  const [messages, setMessage] = React.useState();
 
-  const fetchTranslations = async () => {
-    const response = await fetch('https://dummyjson.com/products');
-    const result = await response.json();
-    return result.products[0];
-  }
 
-  const loadTranslations = async () => {
-    const transResult = await fetchTranslations();
-    console.log(transResult, 'api result');
-    setMessage(transResult);
-  }
+  const [translations, setTranslations] = React.useState<any>({});
+  const [locale, setLocale] = React.useState('en');
+
 
   React.useEffect(() => {
-    loadTranslations();
-  }, [])
-
-  const messagesInFrench = {
-    myMessage: "Aujourd'hui, c'est le {ts, date, ::yyyyMMdd}",
-  }
+    fetch(`https://dummyjson.com/products`)
+      .then((response) => response.json())
+      .then((data) => {
+        debugger
+        const result = data?.products[0];
+        setTranslations(result);
+      });
+  }, [locale]);
 
 
   return (
-    <IntlProvider messages={messagesInFrench} locale="en" defaultLocale="en">
-      <div>LandingPage</div>
-      <FormattedMessage
-        id="myMessage"
-      />
- 
+    <IntlProvider locale={locale} messages={translations}>
+      {translations?.title}
+      <h2>Type 1</h2>
+      <FormattedMessage id="title" />
+      <Test />
     </IntlProvider>
+
   )
 }
 
